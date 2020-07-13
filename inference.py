@@ -36,7 +36,7 @@ class Network:
     and performs synchronous and asynchronous modes for the specified infer requests.
     """
     #log.basicConfig(format="[ %(levelname)s ] %(message)s", level=log.INFO, stream=sys.stdout)
-    
+
     def __init__(self, model_name, device='CPU', extensions=None, threshold=0.5):
         ### TODO: Initialize any class variables desired ###
         self.model_weights=model_name+'.bin'
@@ -44,6 +44,8 @@ class Network:
         self.device=device
         self.threshold=threshold
         self.extensions=extensions
+        self.initial_w = w
+        self.initial_h = h        
 
         try:
             self.model=IENetwork(self.model_structure, self.model_weights)
@@ -65,13 +67,13 @@ class Network:
         self.ie = IECore()
 
         if cpu_extension and 'CPU' in self.device:
-            self.ie.add_extension(cpu_extension, "CPU")          
-        
+            self.ie.add_extension(cpu_extension, "CPU")
+
         # Read IR
         #log.info("Loading network files:\n\t{}\n\t{}".format(self.model_structure, self.model_weights))
         self.net = IENetwork(model=self.model_structure, weights=self.model_weights)
         #self.net = self.ie.read_network(model=self.model_structure, weights=self.model_weights)
-        
+
         ### TODO: Check for supported layers ###
         if "CPU" in self.device:
             supported_layers = self.ie.query_network(self.net, "CPU")
@@ -80,8 +82,8 @@ class Network:
                 log.error("Layers are not supported {}:\n {}".
                       format(self.device, ', '.join(not_supported_layers)))
                 log.error("Specify cpu extensions using -l")
-                sys.exit(1)      
-                
+                sys.exit(1)
+
         # Load IR to the plugin
         #log.info("Loading IR to the plugin...")
         self.exec_net = self.ie.load_network(network=self.net, num_requests=1, device_name=self.device)
@@ -102,7 +104,7 @@ class Network:
         '''
         Perform inference
         '''
-        
+
         #log.info("Performing inference...")
         feed_dict = self.preprocess_input(image)
         outputs=self.exec_net.start_async(request_id=0, inputs=feed_dict)
@@ -157,7 +159,7 @@ class Network:
     def set_initial(self, w, h):
         self.initial_w = w
         self.initial_h = h
-        
+
     def draw_outputs(self, coords, image):
         '''
         Draw Bounding Boxs and texts on images
