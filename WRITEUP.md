@@ -4,15 +4,17 @@
 
 ## Explaining Custom Layers
 
-The process behind converting custom layers involves...
+OpenVINO supports neural network model layers in multiple frameworks. Custom layers are layers that are not included in the list of known layers.
 
-Some of the potential reasons for handling custom layers are...
+The inference engine loads the layers of the input model's IR files into the specified device plug-in, which will look for a list of known layer implementations for the device. If the neural network model contains layers that are not in the list of known layers of the device, the inference engine considers that the layer is not supported and reports an error.
+
+In this case, the custom layer extension must be added / created. Find more information about the process in the Openvino documentation here: https://docs.openvinotoolkit.org/latest/_docs_HOWTO_Custom_Layers_Guide.html
 
 ## Comparing Model Performance
 
-A lot of models was tested in order to find one that have an accuracy sufficient for the project, and if possible, equivalent or superior to the Openvino pre-trained models.
+Many models have been tested in order to find one that has sufficient precision for the project, and if possible, equivalent to or better than the pre-trained Openvino models.
 
-Below the benchmark of the tests:
+Benchmark of the tests:
 
 <table>
   <tr>
@@ -120,18 +122,18 @@ Below the benchmark of the tests:
   </tr>
 </table>
 
-**The benchmark was realised on an i7 8700 CPU, an HD630 iGPU and an Neural Compute Stick (NCS2) VPU.**  
+*The benchmark was made on an i7 8700 CPU, an HD630 iGPU and an Neural Compute Stick (NCS2) VPU.*  
 
-Only Yolo v3 on pytorch meet the requirements. It was slower than the Openvino Retail-0013 but the FPS is still suficient (the video rate of the demo run at 10 FPS).
-Neverseless, sadly Yolo v3 Pytorch model can't be converted (at least for the 2019.3 version of Openvino).
+Only Yolo v3 on pytorch met the requirements. It is slower than the Openvino Retail-0013 but the FPS is still sufficient (the demo video rate turns at 10 FPS).
+Unfortunately, the Yolo v3 Pytorch model cannot be converted (at least for the 2019.3 version of Openvino).
 
-A Tensorflow version of Yolo was converted and tested, but the result was deceptive : the accuracy gone from High to Low, and the FPS was well under the 10 FPS.
+A Tensorflow version of Yolo was converted and tested, but the result was disappointing: the precision went from High to Low and the FPS was well below 10 FPS.
 
-As verification, the demo provided by intel for Yolo was tested but the result was the same.
+For verification, the demo provided by Intel for Yolo was tested but the result was the same.
 
-(1) The variability of the results given for Yolo comes to the difference in mesurement place (taking into account pre/post processing or not). The slowing factor seems not to come from the inference time but from the pre and post processing (certainly du to the complexity of the model). There certainly improvement possible on this way.
+(1) The variability of the results given for Yolo comes from the difference in the place of measurement (whether or not taking pre / post treatment into account). The slowdown factor does not seem to come from the inference time but from the pre and post processing (certainly due to the complexity of the model). There is certainly room for improvement on this path.
 
-So, in definitive, the Retail-0013 model was selected. This model was trained and optimized (from SSD mobilenet v2) for the task and show a very good accuracy/FPS rate.
+So, finally, the Retail-0013 model was selected. This model has been trained and optimized (from SSD mobilenet v2) for the task and has a very good accuracy / FPS rate.
 
 **Model size modification by openvino optimizer process:**
 <table>
@@ -159,7 +161,7 @@ So, in definitive, the Retail-0013 model was selected. This model was trained an
 </table>
 
 **Advantage of running AI to the EDGE (vs Cloud):**
-* Cost saving: for service running 24/7 (videosurveillance), the cost is higly reduced
+* Cost saving: for a 24/7 service (video surveillance), the cost is greatly reduced
 * No need costly network (in term of budget and computer ressource consumption)
 * Better security of data
 
@@ -167,18 +169,18 @@ So, in definitive, the Retail-0013 model was selected. This model was trained an
 
 Some of the potential use cases of the people counter app are :
 
-* **Smart city** : Implanting temporary or definitive camera to ameliorate infrastructure and services. (e.g. Ameliorate pieton circulation). This kind of app permit to have more data processed automaticaly and in real time.
+* **Smart city** : Installation of temporary or permanent cameras to improve infrastructure and services. (for example, improving pedestrian traffic). This type of edge application allows more data to be processed automatically and in real time. In this case, the "Smart" camera with integrated VPU should be the best choice to limit the network speed and respect confidentiality ...
 
-* **Marketing** : For retail it could help to adapt to the flux of customers in a more reactive way and also stock data to make predictive models.
+* **Marketing** : For retail, this could help adapt to the flow of customers more reactively and also store data to create predictive models. A camera placed at the entrance or at another convenient location could send video stream to a computer in charge of the calculation (at the edge).
 
 
 ## Assess Effects on End User Needs
 
 Lighting, model accuracy, and camera focal length/image size have different effects on a
 deployed edge model. The potential effects are:
-* Big changement in lightning could affect the model accuracy. If possible it must be avoided. If it can't be avoided the model could be adapted by a specific training to avoid lost of accuracy.
-* Model accuracy depend on the customers requirement : accuracy or budget priority? speed or better accuracy?... all question that must be taken in account at the beginning of the prject.
-* Camera choice will affect model acuracy and computation requierement, as well as budget. As for model accuracy, all this effect must be taken in account shortly in the project.
+* A large change in lightning could affect the accuracy of the model. If possible, this should be avoided. If this cannot be avoided, the model could be adapted by specific training to avoid any loss of precision.
+* The precision of the model depends on the customer's requirements: precision or budgetary priority? speed or better accuracy? ... any questions that needs to be taken into account at the start of the project.
+* The choice of camera will affect model accuracy and calculation requirements, as well as the budget. Like for the precision of the model, all this must be taken into account at the beginning of  the project.
 
 ## Model Research
 
