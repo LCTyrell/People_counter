@@ -94,7 +94,6 @@ def infer_on_stream(args, client):
     #model_name=args.model
     ### TODO: Load the model through `infer_network` ###
     infer_network.load_model(args.cpu_extension)
-    print("02")
     ### TODO: Handle the input stream ###
     # Handle the input stream
     if video_file == 'CAM': # Check for live feed
@@ -162,22 +161,24 @@ def infer_on_stream(args, client):
                 ### Topic "person": keys of "count" and "total" ###
                 ### Topic "person/duration": key of "duration" ###
 
-            num_people= len(coords)
-            if num_people > people_count_av:
-                if total_people==0:
-                    client.publish("person/duration", json.dumps({"duration": 0}))
+            num_people= len(coords) # number of people detected
+            if num_people > people_count_av: # if new people
+                # to take into account the first people detected we add a 0 duration
+                # side effect due to the fact that the total number of people is counted for each new duration added (in ui)
+                if total_people==0: # so, if first people detected
+                    client.publish("person/duration", json.dumps({"duration": 0}))# the duration 0 is added to have the first people added in total people (in ui)
                 total_people += num_people-people_count
                 start_count_duration = counter
 
-            if  is_diff and is_inf:
+            if  is_diff and is_inf: # if number people is different and inferior to last 10 frames (average)
                 stop_duration_count = counter
-                duration=(stop_duration_count - start_count_duration)/fps
-                client.publish("person/duration", json.dumps({"duration": duration}))
+                duration=(stop_duration_count - start_count_duration)/fps # count(=frame number)/fps is used to get real time (not computational time)
+                client.publish("person/duration", json.dumps({"duration": duration}))# duration is added and total_people incremented (in ui)
                 duration_list.append(stop_duration_count - start_count_duration)
                 start_count_duration = 0
                 stop_duration_count = 0
 
-            average_ten.append(num_people)
+            average_ten.append(num_people) #average of 10 frames is used to avoid some false detection
             if counter %10 == 0:
                 if sum(average_ten)==0:
                     people_count_av =0
@@ -203,12 +204,12 @@ def infer_on_stream(args, client):
             ### TODO: Send the frame to the FFMPEG server ###
             sys.stdout.buffer.write(frame)
             sys.stdout.flush()
-            ### TODO: Write an output image if `single_image_mode` ###
-            if single_image:
+        ### TODO: Write an output image if `single_image_mode` ###
+        if single_image:
                 cv2.imwrite('out.png', frame)
-        ###################tempo
-        Average_infer_time=(sum(timer_list)/len(timer_list))
-        total_Average_duration=((sum(duration_list)/len(duration_list))/fps)
+        ###########
+        #Average_infer_time=(sum(timer_list)/len(timer_list))
+        #total_Average_duration=((sum(duration_list)/len(duration_list))/fps)
         #print(total_Average_duration)
         #print("average time : ",Average_infer_time*1000," ms")
         #print("total: ",total_people)

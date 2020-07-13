@@ -44,8 +44,8 @@ class Network:
         self.device=device
         self.threshold=threshold
         self.extensions=extensions
-        self.initial_w = w
-        self.initial_h = h        
+        #self.initial_w = None
+        #self.initial_h = None
 
         try:
             self.model=IENetwork(self.model_structure, self.model_weights)
@@ -114,7 +114,7 @@ class Network:
                 break
             else: time.sleep(1)
         coords=self.get_output(outputs)
-        #self.draw_outputs(coords, image)
+        self.draw_outputs(coords, image)
         ### TODO: Return any necessary information ###
         return coords, image
 
