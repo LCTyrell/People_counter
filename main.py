@@ -90,11 +90,19 @@ def infer_on_stream(args, client):
     #prob_threshold = args.prob_threshold
     video_file=args.input
     output_path="results"
+    single_img = False
     #model_name=args.model
     ### TODO: Load the model through `infer_network` ###
     infer_network.load_model(args.cpu_extension)
     print("02")
     ### TODO: Handle the input stream ###
+    # Handle the input stream
+    if video_file == 'CAM': # Check for live feed
+        video_file = 0
+
+    elif video_file.endswith('.jpg') or video_file.endswith('.bmp') :    # Check for input image
+        single_img = True
+
     try:
         cap=cv2.VideoCapture(video_file)
     except FileNotFoundError:
@@ -140,11 +148,11 @@ def infer_on_stream(args, client):
             ### TODO: Start asynchronous inference for specified request ###
             ### TODO: Get the results of the inference request ###
             start_infer_timer=time.time()
-            
+
             coords, image = infer_network.predict(frame)
-            
+
             stop_infer_timer=time.time()
-            
+
             infer_time=stop_infer_timer-start_infer_timer
             timer_list.append(infer_time)
 
@@ -153,7 +161,7 @@ def infer_on_stream(args, client):
                 ### current_count, total_count and duration to the MQTT server ###
                 ### Topic "person": keys of "count" and "total" ###
                 ### Topic "person/duration": key of "duration" ###
-            
+
             num_people= len(coords)
             if num_people > people_count_av:
                 if total_people==0:
@@ -180,12 +188,9 @@ def infer_on_stream(args, client):
             is_inf= (people_count_av < count_av)
             count_av = people_count_av
             people_count=num_people
-            
+
             ##################
             client.publish("person", json.dumps({"count": num_people}))
-            #if flag :
-                #client.publish("person/duration", json.dumps({"duration": duration}))
-                #flag = False
             ##################tempo
             #print(f"Number of People in frame = {len(coords)}")
             #print(f"Total number of people = {total_people}")
@@ -199,8 +204,8 @@ def infer_on_stream(args, client):
             sys.stdout.buffer.write(frame)
             sys.stdout.flush()
             ### TODO: Write an output image if `single_image_mode` ###
-            #if single_image_mode:
-                #cv2.imwrite('out_img.png', frame)
+            if single_image:
+                cv2.imwrite('out.png', frame)
         ###################tempo
         Average_infer_time=(sum(timer_list)/len(timer_list))
         total_Average_duration=((sum(duration_list)/len(duration_list))/fps)
