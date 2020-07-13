@@ -161,6 +161,21 @@ def infer_on_stream(args, client):
                 ### Topic "person": keys of "count" and "total" ###
                 ### Topic "person/duration": key of "duration" ###
 
+
+            ###########################################
+
+            FOR REVIEWER : sorry submit a bit quickly!-(
+
+            currently make modif - sorry
+
+
+
+
+
+
+            ######################################
+
+
             num_people= len(coords) # number of people detected
             if num_people > people_count_av: # if new people
                 # to take into account the first people detected we add a 0 duration
