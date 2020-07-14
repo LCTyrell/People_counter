@@ -218,3 +218,7 @@ In investigating potential people counter models, I tried each of the following 
 
   - The model was insufficient for the app because of his low accuracy.
   - I tried to improve the model for the app by modifying accuracy threshold and testing different platform (CPU, GPU, VPU).
+
+  ## Command to run the model (Retail-0013 FP32)
+
+        `python main.py -i resources/Pedestrian_Detect_2_1_1.mp4 -m person-detection-retail-0013 -l /opt/intel/openvino/deployment_tools/inference_engine/lib/intel64/libcpu_extension_sse4.so -d CPU -pt 0.6 | ffmpeg -v warning -f rawvideo -pixel_format bgr24 -video_size 768x432 -framerate 24 -i - http://0.0.0.0:3004/fac.ffm`
