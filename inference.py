@@ -21,6 +21,7 @@
  OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+#from udacity workspace
 
 import os
 import sys
@@ -45,7 +46,7 @@ class Network:
         self.threshold=threshold
         self.extensions=extensions
         #self.initial_w = None
-        #self.initial_h = None
+        #self.initial_h = None        
 
         try:
             self.model=IENetwork(self.model_structure, self.model_weights)
